@@ -3,18 +3,45 @@
 #include <SFML/Window/Mouse.hpp>
 #include "Schiebregler.h"
 #include "board.h"
+#include <iostream>
+
 int main() {
     sf::RenderWindow window(
-        sf::VideoMode(800, 600),
+        sf::VideoMode(1200, 1000),
         "Probmap"
     );
-    Schiebregler slider(700.f, 100.f, 20.f, 200.f);
-    Board board(20, 15, 32.f);
+    sf::Font font;
+    if (!font.loadFromFile("font/Inter-VariableFont_opsz,wght.ttf")) {
+        std::cout << "Fehler beim Laden der Schriftart\n";
+        return -1;
+    }
 
-    board.setColor(0, 0, sf::Color::Red);
-    board.setColor(1, 0, sf::Color::Green);
-    board.setColor(2, 0, sf::Color::Blue);
-    board.setColor(5, 5, sf::Color::Yellow);
+    int lx = 1000;
+    int ly = 1000;
+    float cellSize = 4.f;
+
+
+
+
+    int width = lx / cellSize;
+    int height = ly / cellSize;
+
+    Schiebregler slider(1100.f, 100.f, 20.f, 200.f);
+    GridLines grid(width, height);
+    float threshold = slider.getValue();
+    threshold = 0.5f;
+    std::vector<int> regions = grid.createRegions(threshold);
+    regions = createMax4ConnectedRegions(regions, width, height);
+
+    Board board(width, height, cellSize);
+    board.setColors(regions);
+
+    board.setColors(regions);
+    
+
+
+    
+    
     while (window.isOpen())
     {
         sf::Event event;
@@ -34,16 +61,39 @@ int main() {
             if (event.type == sf::Event::MouseButtonReleased 
                 && event.mouseButton.button == sf::Mouse::Left) {
                 slider.isDragging = false;
+                
             }
-        }
+            if (event.key.code == sf::Keyboard::Up) {
+                
+                slider.handle.setPosition(slider.handle.getPosition().x, slider.position.y +(1-slider.getValue()) * slider.track.getSize().y);
+                threshold = slider.getValue();
+                regions = grid.createRegions(threshold);
+                regions = createMax4ConnectedRegions(regions, width, height);
+                board.setColors(regions);
+
+            }
+            if (event.key.code == sf::Keyboard::Down) {
+                
+                slider.handle.setPosition(slider.handle.getPosition().x, slider.position.y +(slider.getValue()) * slider.track.getSize().y);
+                
+                threshold = slider.getValue();
+                regions = grid.createRegions(threshold);
+                regions = createMax4ConnectedRegions(regions, width, height);
+                board.setColors(regions);
+            }
+            }
         sf::Vector2i mouse = sf::Mouse::getPosition(window);
 
         if (slider.isDragging) {
             slider.dragging(mouse);
+            threshold = slider.getValue();
+            regions = grid.createRegions(threshold);
+            regions = createMax4ConnectedRegions(regions, width, height);
+            board.setColors(regions);
 
         }
         window.clear();
-        slider.draw(window);
+        slider.draw(window, font);
         board.draw(window);
         window.display();
 

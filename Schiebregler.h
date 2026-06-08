@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Font.hpp>
 
 
 
@@ -28,7 +29,14 @@ struct Schiebregler {
         track.setSize(sf::Vector2f(width/3, height));
         track.setFillColor(trackColor);
     }
-    void draw(sf::RenderWindow& window) {
+    void draw(sf::RenderWindow& window, sf::Font& font) {
+        sf::Text text;
+        text.setFont(font);
+        text.setString(std::to_string(1-getValue()));
+        text.setFillColor(sf::Color::White);
+        text.setCharacterSize(20);
+        text.setPosition(position.x + track.getSize().x * 2, position.y);
+        window.draw(text);
         window.draw(track);
         window.draw(handle);
 
