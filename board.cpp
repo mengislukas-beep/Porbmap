@@ -46,7 +46,28 @@ void Board::draw(sf::RenderWindow& window)
     window.draw(m_vertices);
 }
 
-
+void Board::setColors(const std::vector<int>& regions) {
+    for (int i = 0; i < static_cast<int>(regions.size()); i++) {
+        int x = i % m_width;
+        int y = i / m_width;
+        if (regions[i] ==  0) 
+        {
+            setColor(x, y, sf::Color::Red);
+        }
+        if (regions[i] ==  1) 
+        {
+            setColor(x, y, sf::Color::Green);
+        }
+        if (regions[i] ==  2) 
+        {
+            setColor(x, y, sf::Color::Blue);
+        }
+        if (regions[i] ==  3) 
+        {
+            setColor(x, y, sf::Color::Yellow);
+        }
+    }
+}
 
 
 GridLines::GridLines(int width, int height)
